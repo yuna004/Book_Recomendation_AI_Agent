@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Recommendation Chatbot</title>
+    <style>
+        /* General body styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #EDE8DC; /* Light beige */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: stretch; /* Fill full height */
+        }
+
+        /* Chatbot container */
+        .chat-container {
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header styling */
+        .chat-header {
+            background-color: #A5B68D; /* Muted green */
+            color: #FFFFFF;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Chatbox area */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #EDE8DC; /* Light beige */
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            max-width: 35%;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* User message styling */
+        .user-message {
+            background-color: #E7CCCC; /* Light rosy beige */
+            color: #333333;
+            margin-left: auto;
+        }
+
+        /* Bot message styling */
+        .bot-message {
+            background-color: #C1CFA1; /* Softer green */
+            color: #333333;
+        }
+
+        /* Input area */
+        .input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 15px;
+            background-color: #E7CCCC; /* Light rosy beige */
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #C1CFA1; /* Softer green border */
+            border-radius: 6px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-container button {
+            margin-left: 10px;
+            padding: 15px 20px;
+            border: none;
+            background-color: #A5B68D; /* Muted green */
+            color: #FFFFFF;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .input-container button:hover {
+            background-color: #8D9F7A; /* Slightly darker muted green */
+        }
+    </style>
+</head>
+<body>
+    <!-- Chatbot Container -->
+    <div class="chat-container">
+        <!-- Chatbot Header -->
+        <div class="chat-header">
+            📚 Book Recommendation Bot 📚
+        </div>
+
+        <!-- Chatbox Area -->
+        <div class="chat-box" id="chat-box">
+            <!-- Initial bot message -->
+            <div class="chat-message bot-message">
+                Welcome to the Book Recommendation Bot!
+            </div>
+            <div class="chat-message bot-message">
+                I'm here to help you find books you'll love.
+            </div>
+            <div class="chat-message bot-message">
+                Tell me what you're looking for in a book!
+            </div>
+            <div class="chat-message bot-message">
+                For example: 'I love books with genre fantasy by J.K. Rowling'
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle chat functionality -->
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+
+            const message = userInput.value.trim();
+            if (message === "") return;
+
+            // Append user message to chat
+            const userMessage = document.createElement("div");
+            userMessage.className = "chat-message user-message";
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+
+            // Scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Clear input
+            userInput.value = "";
+
+            // Send message to backend
+            fetch("/send_message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: message }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Append bot response
+                const botMessage = document.createElement("div");
+                botMessage.className = "chat-message bot-message";
+                botMessage.textContent = data.response;
+                chatBox.appendChild(botMessage);
+
+                // Scroll to bottom
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
